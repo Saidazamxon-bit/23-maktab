@@ -3,6 +3,18 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/admin",
+      "destination": "/admin-panel/",
+      "permanent": false
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/admin-panel/",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/backend/:path*",
