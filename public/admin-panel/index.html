@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maktab jadvali — admin</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg: #eceff4;
+  --panel: #ffffff;
+  --ink: #172033;
+  --muted: #5b667a;
+  --line: #d9dee8;
+  --brand: #1f3a6e;
+  --brand-ink: #ffffff;
+  --bell: #c98a00;
+  --danger: #b3261e;
+  --ok: #1d7a4b;
+  --shadow: 0 1px 2px rgba(23, 32, 51, .08);
+  --radius: 10px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1522;
+    --panel: #172033;
+    --ink: #e8ecf4;
+    --muted: #9aa6bd;
+    --line: #2a3650;
+    --brand: #8fb0f2;
+    --brand-ink: #0f1522;
+    --bell: #e8b43a;
+    --danger: #ff8a80;
+    --ok: #6fd3a0;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 15px/1.5 "Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+h1, h2, h3 { margin: 0; line-height: 1.2; letter-spacing: -.01em; }
+h1 { font-size: 26px; font-weight: 700; }
+h2 { font-size: 18px; font-weight: 600; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+:focus-visible { outline: 3px solid var(--bell); outline-offset: 2px; border-radius: 4px; }
+
+/* ---------- layout ---------- */
+.shell { display: grid; grid-template-columns: 224px 1fr; min-height: 100vh; }
+.side {
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  padding: 22px 14px;
+  display: flex; flex-direction: column; gap: 22px;
+  position: sticky; top: 0; height: 100vh;
+}
+.brand { padding: 0 10px; display: flex; flex-direction: column; gap: 2px; }
+.brand b { font-size: 17px; font-weight: 700; }
+.brand span { color: var(--muted); font-size: 13px; }
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav a {
+  display: block; padding: 9px 12px; border-radius: 8px;
+  color: var(--ink); text-decoration: none; font-weight: 500;
+  border-left: 3px solid transparent;
+}
+.nav a:hover { background: var(--bg); }
+.nav a[aria-current="page"] { background: var(--bg); border-left-color: var(--bell); font-weight: 600; }
+.side .who { margin-top: auto; padding: 0 10px; display: flex; flex-direction: column; gap: 8px; }
+.main { padding: 32px clamp(16px, 4vw, 44px) 64px; max-width: 1180px; width: 100%; }
+.head { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; margin-bottom: 22px; }
+.head p { color: var(--muted); margin-top: 4px; max-width: 60ch; }
+
+@media (max-width: 800px) {
+  .shell { grid-template-columns: 1fr; }
+  .side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 12px 14px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .brand { flex: 1 1 auto; }
+  .nav { flex-direction: row; overflow-x: auto; width: 100%; order: 3; padding-bottom: 2px; }
+  .nav a { white-space: nowrap; border-left: 0; border-bottom: 3px solid transparent; border-radius: 6px 6px 0 0; }
+  .nav a[aria-current="page"] { border-bottom-color: var(--bell); }
+  .side .who { margin: 0; flex-direction: row; align-items: center; }
+  .main { padding-top: 22px; }
+}
+
+/* ---------- controls ---------- */
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+.card + .card { margin-top: 16px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+label.f { display: flex; flex-direction: column; gap: 5px; font-weight: 500; font-size: 14px; }
+input, select, textarea {
+  font: inherit; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; min-height: 40px; width: 100%;
+}
+textarea { resize: vertical; min-height: 110px; }
+input:focus, select:focus, textarea:focus { border-color: var(--brand); }
+.btn {
+  font: inherit; font-weight: 600; cursor: pointer; min-height: 40px;
+  padding: 8px 16px; border-radius: 8px; border: 1px solid var(--brand);
+  background: var(--brand); color: var(--brand-ink);
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:disabled { opacity: .55; cursor: wait; }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { background: var(--bg); filter: none; }
+.btn.danger { background: transparent; color: var(--danger); border-color: var(--line); }
+.btn.sm { min-height: 32px; padding: 4px 10px; font-size: 13px; font-weight: 500; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 4px 3px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); font-weight: 600; }
+.chip small { font-weight: 400; color: var(--muted); }
+.chip button { all: unset; cursor: pointer; width: 22px; height: 22px; border-radius: 50%; text-align: center; line-height: 22px; color: var(--muted); }
+.chip button:hover { background: var(--line); color: var(--danger); }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--bg); border: 1px solid var(--line); color: var(--muted); }
+.badge.ok { color: var(--ok); border-color: currentColor; background: transparent; }
+code.code { font: 600 15px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .08em; background: var(--bg); padding: 6px 9px; border-radius: 6px; border: 1px dashed var(--line); user-select: all; }
+
+/* ---------- tables ---------- */
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl th { text-align: left; font-weight: 600; color: var(--muted); font-size: 13px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.tbl td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: 0; }
+.tbl .acts { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.scroll { overflow-x: auto; }
+
+/* ---------- dashboard ---------- */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.stat b { display: block; font-size: 30px; line-height: 1.1; font-weight: 700; }
+.stat span { color: var(--muted); font-size: 13px; }
+.steps { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.steps li { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 8px; }
+.steps li:hover { background: var(--bg); }
+.steps .tick { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 13px; color: transparent; }
+.steps li.done .tick { background: var(--ok); border-color: var(--ok); color: #fff; }
+.steps a { color: inherit; font-weight: 600; text-decoration: none; }
+.steps a:hover { text-decoration: underline; }
+
+/* ---------- classes ---------- */
+.grades { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 16px; }
+.grade { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+.grade h3 { font-size: 15px; margin-bottom: 10px; }
+.grade .chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 30px; }
+
+/* ---------- timetable ---------- */
+.tt { width: 100%; border-collapse: separate; border-spacing: 5px; min-width: 760px; table-layout: fixed; }
+.tt th { font-weight: 600; font-size: 14px; text-align: left; padding: 4px 6px; }
+.tt thead th { color: var(--muted); }
+.tt .bellcol { width: 78px; }
+.tt .bellcol b { font-size: 20px; color: var(--bell); display: block; line-height: 1; margin-bottom: 3px; }
+.tt .bellcol span { font-size: 12px; color: var(--muted); font-weight: 400; white-space: nowrap; }
+.tt td { height: 74px; padding: 0; vertical-align: top; }
+.lesson {
+  --h: 210;
+  all: unset; box-sizing: border-box; display: flex; flex-direction: column; gap: 2px;
+  width: 100%; height: 100%; padding: 8px 10px; cursor: pointer; overflow: hidden;
+  border-radius: 8px; border-left: 5px solid hsl(var(--h) 55% 42%);
+  background: hsl(var(--h) 65% 91%); color: hsl(var(--h) 45% 16%);
+}
+.lesson.ro { cursor: default; }
+.lesson strong { font-size: 14px; line-height: 1.2; }
+.lesson span { font-size: 12px; opacity: .85; }
+.lesson:focus-visible { outline: 3px solid var(--bell); }
+@media (prefers-color-scheme: dark) {
+  .lesson { background: hsl(var(--h) 30% 24%); color: hsl(var(--h) 60% 92%); border-left-color: hsl(var(--h) 60% 62%); }
+}
+.slot {
+  all: unset; box-sizing: border-box; display: grid; place-items: center; width: 100%; height: 100%;
+  border: 1.5px dashed var(--line); border-radius: 8px; color: var(--muted); cursor: pointer; font-size: 20px;
+}
+.slot:hover, .slot:focus-visible { border-color: var(--brand); color: var(--brand); background: var(--panel); }
+.slot.ro { cursor: default; border-style: solid; border-color: transparent; background: var(--bg); }
+
+/* ---------- dialog / toast ---------- */
+dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); padding: 22px; width: min(440px, calc(100vw - 24px)); box-shadow: 0 18px 50px rgba(0, 0, 0, .3); }
+dialog::backdrop { background: rgba(10, 16, 28, .5); }
+dialog form { display: flex; flex-direction: column; gap: 14px; }
+dialog .foot { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; margin-top: 4px; }
+dialog .foot div { display: flex; gap: 8px; }
+#toasts { position: fixed; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 50; max-width: min(380px, calc(100vw - 32px)); }
+.toast { background: var(--ink); color: var(--bg); padding: 11px 14px; border-radius: 10px; font-weight: 500; box-shadow: 0 8px 24px rgba(0, 0, 0, .25); }
+.toast.err { background: var(--danger); color: #fff; }
+@media (prefers-color-scheme: dark) { .toast.err { color: #1a0505; } }
+
+/* ---------- login ---------- */
+.login { min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+.login .card { width: min(380px, 100%); padding: 28px; }
+.login h1 { font-size: 24px; }
+.login .bar { height: 4px; width: 44px; background: var(--bell); border-radius: 2px; margin-bottom: 18px; }
+
+.empty { padding: 28px 12px; text-align: center; color: var(--muted); }
+.codes { white-space: pre-wrap; font: 600 14px/1.7 ui-monospace, Menlo, Consolas, monospace; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin-top: 10px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .toast { animation: pop .18s ease-out; }
+  @keyframes pop { from { transform: translateY(8px); opacity: 0; } }
+}
+
+@media print {
+  body { background: #fff; color: #000; }
+  .side, .noprint, #toasts { display: none !important; }
+  .shell { display: block; }
+  .main { padding: 0; max-width: none; }
+  .lesson { background: #fff !important; color: #000 !important; border: 1px solid #888; border-left: 5px solid #444; }
+  .slot { border-color: #ccc; }
+}
+
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="toasts" aria-live="polite"></div>
+  <noscript>Admin panel ishlashi uchun JavaScript kerak.</noscript>
+  <script>// Backend (api.php joylashgan papka) manzili — oxirida "/" bo'lmasin.
+// Panel va backend boshqa-boshqa saytda bo'lsa, ikkalasi ham HTTPS bo'lishi shart.
+window.MAKTAB_API = 'https://6a70174330801.xvest4.ru/23maktab';</script>
+  <script>
+'use strict';
+
+const API = String(window.MAKTAB_API || '').replace(/\/+$/, '');
+const DAYS = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'];
+const SUBJECTS = ['Matematika', 'Algebra', 'Geometriya', 'Ona tili', 'Adabiyot', 'O\'qish', 'Ingliz tili', 'Rus tili',
+  'Tarix', 'Geografiya', 'Biologiya', 'Fizika', 'Kimyo', 'Informatika', 'Jismoniy tarbiya',
+  'Tasviriy san\'at', 'Musiqa', 'Texnologiya', 'Atrofimizdagi olam', 'Tarbiya'];
+
+let token = '';
+try { token = localStorage.getItem('maktab_token') || ''; } catch (e) {}
+
+/* ---------------------------------------------------------------- helpers */
+
+function h(tag, props, ...kids) {
+  const el = document.createElement(tag);
+  let value;
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'value') value = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (v === true) el.setAttribute(k, '');
+    else el.setAttribute(k, v);
+  }
+  for (const kid of kids.flat(Infinity)) {
+    if (kid == null || kid === false) continue;
+    el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  }
+  if (value !== undefined) el.value = value;
+  return el;
+}
+
+function toast(msg, isErr) {
+  const t = h('div', { class: 'toast' + (isErr ? ' err' : ''), role: isErr ? 'alert' : 'status' }, msg);
+  document.getElementById('toasts').append(t);
+  setTimeout(() => t.remove(), isErr ? 6000 : 3000);
+}
+
+async function api(resource, opts) {
+  const { method = 'GET', query = {}, body } = opts || {};
+  const qs = new URLSearchParams(Object.assign({ r: resource }, query));
+  let res;
+  try {
+    res = await fetch(`${API}/api.php?${qs}`, {
+      method,
+      headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { 'X-Auth-Token': token } : {}),
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch (e) {
+    throw new Error('Serverga ulanib bo\'lmadi. config.js dagi manzilni va internetni tekshiring.');
+  }
+  let data = {};
+  try { data = await res.json(); } catch (e) {}
+  if (res.status === 401 && resource !== 'login') { setToken(''); render(); throw new Error(data.error || 'Sessiya tugagan'); }
+  if (!res.ok) {
+    const err = new Error(data.error || `Xatolik (${res.status})`);
+    err.status = res.status; err.data = data;
+    throw err;
+  }
+  return data;
+}
+const post = (resource, action, body) => api(resource, { method: 'POST', body: Object.assign({ action }, body || {}) });
+
+function setToken(t) {
+  token = t;
+  try { t ? localStorage.setItem('maktab_token', t) : localStorage.removeItem('maktab_token'); } catch (e) {}
+}
+
+async function guard(btn, fn) {
+  if (btn) btn.disabled = true;
+  try { return await fn(); }
+  catch (e) { toast(e.message, true); }
+  finally { if (btn) btn.disabled = false; }
+}
+
+function copy(text) {
+  const done = () => toast('Nusxalandi');
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done));
+  } else fallbackCopy(text, done);
+}
+function fallbackCopy(text, done) {
+  const ta = h('textarea', { style: 'position:fixed;opacity:0' }, text);
+  document.body.append(ta); ta.select();
+  try { document.execCommand('copy'); done(); } catch (e) { toast('Nusxalab bo\'lmadi', true); }
+  ta.remove();
+}
+
+function hue(s) {
+  let x = 0;
+  for (const c of String(s).toLowerCase()) x = (x * 31 + c.charCodeAt(0)) % 360;
+  return x;
+}
+function shortName(full) {
+  const w = String(full || '').split(/\s+/).filter(Boolean);
+  return w.length ? w[0] + (w.length > 1 ? ' ' + w.slice(1).map(x => x[0].toUpperCase() + '.').join('') : '') : '';
+}
+
+/* ---------------------------------------------------------------- shell & router */
+
+const ROUTES = [
+  ['', 'Bosh sahifa', viewHome],
+  ['classes', 'Sinflar', viewClasses],
+  ['teachers', 'O\'qituvchilar', viewTeachers],
+  ['schedule', 'Dars jadvali', viewSchedule],
+  ['bells', 'Qo\'ng\'iroqlar', viewBells],
+  ['settings', 'Sozlamalar', viewSettings],
+];
+
+function render() {
+  const app = document.getElementById('app');
+  app.replaceChildren();
+  if (!token) { app.append(loginView()); return; }
+
+  const path = (location.hash.replace(/^#\/?/, '') || '');
+  const route = ROUTES.find(r => r[0] === path) || ROUTES[0];
+  const main = h('main', { class: 'main' });
+  app.append(h('div', { class: 'shell' },
+    h('aside', { class: 'side' },
+      h('div', { class: 'brand' }, h('b', null, '23-maktab'), h('span', null, 'Dars jadvali boti')),
+      h('nav', { class: 'nav', 'aria-label': 'Bo\'limlar' },
+        ROUTES.map(r => h('a', { href: '#/' + r[0], 'aria-current': r === route ? 'page' : null }, r[1]))),
+      h('div', { class: 'who' },
+        h('button', { class: 'btn ghost sm', onclick: logout }, 'Chiqish'))),
+    main));
+  document.title = route[1] + ' — maktab jadvali';
+  main.append(h('p', { class: 'muted' }, 'Yuklanmoqda…'));
+  route[2](main).catch(e => { main.replaceChildren(h('div', { class: 'card' }, h('p', null, e.message))); });
+}
+
+async function logout() {
+  try { await post('logout', ''); } catch (e) {}
+  setToken('');
+  render();
+}
+
+function pageHead(title, desc, extra) {
+  return h('div', { class: 'head' }, h('div', null, h('h1', null, title), desc ? h('p', null, desc) : null), extra || null);
+}
+
+window.addEventListener('hashchange', render);
+
+/* ---------------------------------------------------------------- login */
+
+function loginView() {
+  const err = h('p', { class: 'small', style: 'color:var(--danger);min-height:1.4em', role: 'alert' });
+  const btn = h('button', { class: 'btn', type: 'submit' }, 'Kirish');
+  const form = h('form', { class: 'stack', onsubmit: async (e) => {
+    e.preventDefault();
+    err.textContent = '';
+    const fd = new FormData(form);
+    btn.disabled = true;
+    try {
+      const d = await api('login', { method: 'POST', body: { username: fd.get('u'), password: fd.get('p') } });
+      setToken(d.token);
+      location.hash = '#/';
+      render();
+    } catch (ex) { err.textContent = ex.message; }
+    btn.disabled = false;
+  } },
+    h('label', { class: 'f' }, 'Login', h('input', { name: 'u', autocomplete: 'username', required: true, autofocus: true })),
+    h('label', { class: 'f' }, 'Parol', h('input', { name: 'p', type: 'password', autocomplete: 'current-password', required: true })),
+    err, btn);
+  return h('div', { class: 'login' }, h('div', { class: 'card' },
+    h('div', { class: 'bar' }),
+    h('h1', null, '23-maktab jadvali'),
+    h('p', { class: 'muted', style: 'margin:6px 0 20px' }, 'Administrator paneliga kiring'),
+    form));
+}
+
+/* ---------------------------------------------------------------- home */
+
+async function viewHome(root) {
+  const s = await api('stats');
+  const steps = [
+    [s.classes > 0, '#/classes', 'Sinflarni qo\'shing', `${s.classes} ta sinf`],
+    [s.bells > 0, '#/bells', 'Qo\'ng\'iroq vaqtlarini tekshiring', `${s.bells} ta dars vaqti`],
+    [s.teachers > 0, '#/teachers', 'O\'qituvchilarni qo\'shing va kodlarini bering', `${s.teachers} ta o'qituvchi`],
+    [s.lessons > 0, '#/schedule', 'Dars jadvalini to\'ldiring', `${s.lessons} ta dars`],
+  ];
+  root.replaceChildren(
+    pageHead('Bosh sahifa', 'Bot shu yerdagi ma\'lumotlardan foydalanadi: sinflar, o\'qituvchilar va jadval o\'zgarsa, bot darhol yangisini ko\'rsatadi.'),
+    h('div', { class: 'stats' },
+      stat(s.classes, 'sinf'), stat(s.teachers, 'o\'qituvchi'),
+      stat(s.bound_teachers, 'botga ulangan o\'qituvchi'), stat(s.students, 'botdagi o\'quvchi'), stat(s.lessons, 'dars')),
+    h('div', { class: 'card' }, h('h2', null, 'Ishga tushirish'),
+      h('ul', { class: 'steps' }, steps.map(([done, href, title, note]) =>
+        h('li', { class: done ? 'done' : '' }, h('span', { class: 'tick', 'aria-hidden': 'true' }, '✓'),
+          h('a', { href }, title), h('span', { class: 'muted small' }, note))))));
+}
+const stat = (n, label) => h('div', { class: 'stat' }, h('b', null, n), h('span', null, label));
+
+/* ---------------------------------------------------------------- classes */
+
+async function viewClasses(root) {
+  const { classes } = await api('classes');
+  const gradeSel = h('select', { name: 'grade' }, h('option', { value: 'all' }, 'Barcha sinflar (1–11)'),
+    Array.from({ length: 11 }, (_, i) => h('option', { value: i + 1 }, `${i + 1}-sinf`)));
+  const letters = h('input', { name: 'letters', placeholder: 'A, B, V', required: true });
+  const btn = h('button', { class: 'btn', type: 'submit' }, 'Qo\'shish');
+  const form = h('form', { class: 'row', onsubmit: (e) => {
+    e.preventDefault();
+    guard(btn, async () => {
+      const d = await post('classes', 'add', { grade: gradeSel.value, letters: letters.value });
+      toast(d.added ? `${d.added} ta sinf qo'shildi` : 'Bu sinflar allaqachon bor');
+      render();
+    });
+  } },
+    h('label', { class: 'f', style: 'flex:1 1 200px' }, 'Sinf darajasi', gradeSel),
+    h('label', { class: 'f', style: 'flex:1 1 200px' }, 'Harflar', letters),
+    btn);
+
+  const byGrade = {};
+  classes.forEach(c => (byGrade[c.grade] = byGrade[c.grade] || []).push(c));
+
+  root.replaceChildren(
+    pageHead('Sinflar', 'Bot shu ro\'yxatdan sinflarni oladi: o\'quvchi avval raqamni, keyin harfni tanlaydi.'),
+    h('div', { class: 'card' }, form,
+      h('p', { class: 'muted small', style: 'margin-top:10px' }, 'Bir nechta harfni vergul bilan yozing. “Barcha sinflar” tanlansa, har bir daraja uchun shu harflar qo\'shiladi.')),
+    h('div', { class: 'grades' }, Array.from({ length: 11 }, (_, i) => i + 1).map(g =>
+      h('section', { class: 'grade' }, h('h3', null, `${g}-sinf`),
+        h('div', { class: 'chips' }, (byGrade[g] || []).length
+          ? byGrade[g].map(c => h('span', { class: 'chip' }, c.name,
+              h('small', null, `${c.lessons} dars`),
+              h('button', { 'aria-label': `${c.name} sinfini o'chirish`, title: 'O\'chirish', onclick: () => {
+                if (!confirm(`${c.name} sinfi va uning ${c.lessons} ta darsi o'chiriladi. Davom etasizmi?`)) return;
+                guard(null, async () => { await post('classes', 'delete', { id: c.id }); render(); });
+              } }, '×')))
+          : h('span', { class: 'muted small' }, 'Sinf yo\'q'))))));
+}
+
+/* ---------------------------------------------------------------- teachers */
+
+async function viewTeachers(root) {
+  const { teachers } = await api('teachers');
+  const names = h('textarea', { name: 'names', placeholder: 'Aliyev Vali\nKarimova Dilfuza\nToshmatov Jasur', required: true });
+  const btn = h('button', { class: 'btn', type: 'submit' }, 'Qo\'shish va kod berish');
+  const result = h('div');
+
+  const form = h('form', { class: 'stack', onsubmit: (e) => {
+    e.preventDefault();
+    guard(btn, async () => {
+      const list = names.value.split('\n').map(x => x.trim()).filter(Boolean);
+      const d = await post('teachers', 'create', { names: list });
+      if (d.skipped.length) toast('O\'tkazib yuborildi: ' + d.skipped.join('; '), true);
+      if (!d.created.length) return;
+      const text = d.created.map(t => `${t.full_name} — ${t.code}`).join('\n');
+      result.replaceChildren(h('div', { class: 'card', style: 'margin-top:16px' },
+        h('h2', null, `${d.created.length} ta o'qituvchi qo'shildi`),
+        h('p', { class: 'muted small', style: 'margin-top:4px' }, 'Kodlarni o\'qituvchilarga shaxsan bering. Kod ro\'yxatda keyin ham ko\'rinadi.'),
+        h('div', { class: 'codes' }, text),
+        h('div', { class: 'row', style: 'margin-top:12px' },
+          h('button', { class: 'btn ghost sm', onclick: () => copy(text) }, 'Nusxalash'),
+          h('button', { class: 'btn ghost sm', onclick: () => downloadCsv(d.created) }, 'CSV yuklab olish'))));
+      names.value = '';
+      reloadTable();
+    });
+  } },
+    h('label', { class: 'f' }, 'Ism va familiya (har qatorda bittadan)', names), btn);
+
+  const tableHost = h('div', { class: 'card scroll', style: 'margin-top:16px' });
+  const reloadTable = async () => {
+    const d = await api('teachers');
+    tableHost.replaceChildren(teacherTable(d.teachers, reloadTable));
+  };
+  tableHost.append(teacherTable(teachers, reloadTable));
+
+  root.replaceChildren(
+    pageHead('O\'qituvchilar', 'Har bir o\'qituvchiga shaxsiy kod beriladi. O\'qituvchi botda ismini va kodini bir marta kiritadi — hisob unga biriktirilib, keyin qayta so\'ralmaydi. Shuning uchun o\'quvchilar o\'qituvchi bo\'limiga kira olmaydi.'),
+    h('div', { class: 'card' }, form), result, tableHost);
+}
+
+function teacherTable(list, reload) {
+  if (!list.length) return h('p', { class: 'empty' }, 'Hali o\'qituvchi yo\'q. Yuqoridagi maydonga ismlarni yozing.');
+  const act = (label, cls, fn) => h('button', { class: 'btn sm ' + cls, onclick: (e) => guard(e.currentTarget, async () => { await fn(); await reload(); }) }, label);
+  return h('table', { class: 'tbl' },
+    h('thead', null, h('tr', null, ['Ism familiya', 'Kod', 'Bot', 'Darslar', ''].map(x => h('th', null, x)))),
+    h('tbody', null, list.map(t => h('tr', null,
+      h('td', null, h('b', null, t.full_name)),
+      h('td', null, h('code', { class: 'code' }, t.code), ' ',
+        h('button', { class: 'btn ghost sm', onclick: () => copy(t.code) }, 'Nusxa')),
+      h('td', null, t.bound ? h('span', { class: 'badge ok' }, 'Ulangan') : h('span', { class: 'badge' }, 'Kirmagan')),
+      h('td', null, t.lessons),
+      h('td', null, h('div', { class: 'acts' },
+        act('Ismni o\'zgartirish', 'ghost', async () => {
+          const n = prompt('Yangi ism va familiya:', t.full_name);
+          if (n && n.trim() !== t.full_name) await post('teachers', 'rename', { id: t.id, full_name: n });
+        }),
+        t.bound ? act('Ulanishni tiklash', 'ghost', async () => {
+          if (!confirm(`${t.full_name} botdan chiqariladi. Kod o'zgarmaydi, lekin yangi hisobdan qayta kirishi mumkin bo'ladi. Davom etasizmi?`)) return;
+          await post('teachers', 'unbind', { id: t.id }); toast('Ulanish tiklandi');
+        }) : null,
+        act('Yangi kod', 'ghost', async () => {
+          if (!confirm(`${t.full_name} uchun yangi kod yaratilsin? Eski kod ishlamaydi va o'qituvchi botdan chiqariladi.`)) return;
+          const d = await post('teachers', 'regen', { id: t.id }); toast('Yangi kod: ' + d.code);
+        }),
+        act('O\'chirish', 'danger', async () => {
+          if (!confirm(`${t.full_name} o'chiriladi. Uning darslari o'qituvchisiz qoladi. Davom etasizmi?`)) return;
+          await post('teachers', 'delete', { id: t.id });
+        })))))));
+}
+
+function downloadCsv(rows) {
+  const csv = '﻿Ism familiya,Kod\n' + rows.map(r => `"${r.full_name.replace(/"/g, '""')}",${r.code}`).join('\n');
+  const a = h('a', { href: URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })), download: 'oqituvchi-kodlari.csv' });
+  document.body.append(a); a.click(); a.remove();
+}
+
+/* ---------------------------------------------------------------- schedule */
+
+async function viewSchedule(root) {
+  const [{ classes }, { teachers }, { bells }] = await Promise.all([api('classes'), api('teachers'), api('bells')]);
+  if (!classes.length) { root.replaceChildren(pageHead('Dars jadvali'), h('div', { class: 'card empty' }, 'Avval ', h('a', { href: '#/classes' }, 'sinflarni qo\'shing'), '.')); return; }
+  if (!bells.length) { root.replaceChildren(pageHead('Dars jadvali'), h('div', { class: 'card empty' }, 'Avval ', h('a', { href: '#/bells' }, 'qo\'ng\'iroq vaqtlarini kiriting'), '.')); return; }
+
+  let mode = 'class';
+  let targetId = classes[0].id;
+  const modeSel = h('select', { 'aria-label': 'Ko\'rinish', onchange: () => { mode = modeSel.value; targetId = null; fillTargets(); load(); } },
+    h('option', { value: 'class' }, 'Sinf bo\'yicha (tahrirlash)'),
+    h('option', { value: 'teacher' }, 'O\'qituvchi bo\'yicha (ko\'rish)'));
+  const targetSel = h('select', { 'aria-label': 'Tanlash', onchange: () => { targetId = +targetSel.value; load(); } });
+  const host = h('div', { class: 'card scroll' });
+
+  function fillTargets() {
+    const items = mode === 'class' ? classes.map(c => [c.id, c.name + ' sinf']) : teachers.map(t => [t.id, t.full_name]);
+    targetSel.replaceChildren(...items.map(([v, t]) => h('option', { value: v }, t)));
+    if (!items.length) { targetId = null; return; }
+    if (targetId == null || !items.some(i => i[0] === targetId)) targetId = items[0][0];
+    targetSel.value = targetId;
+  }
+
+  async function load() {
+    if (targetId == null) { host.replaceChildren(h('p', { class: 'empty' }, mode === 'teacher' ? 'O\'qituvchilar yo\'q.' : 'Sinflar yo\'q.')); return; }
+    const key = mode === 'class' ? 'class_id' : 'teacher_id';
+    const { lessons } = await api('lessons', { query: { [key]: targetId } });
+    host.replaceChildren(timetable(lessons));
+  }
+
+  function timetable(lessons) {
+    const map = {};
+    lessons.forEach(l => { map[l.weekday + '-' + l.lesson_no] = l; });
+    const ro = mode !== 'class';
+    return h('table', { class: 'tt' },
+      h('thead', null, h('tr', null, h('th', { class: 'bellcol' }), DAYS.map(d => h('th', { scope: 'col' }, d)))),
+      h('tbody', null, bells.map(b => h('tr', null,
+        h('th', { class: 'bellcol', scope: 'row' }, h('b', null, b.lesson_no), h('span', null, `${b.start_time}–${b.end_time}`)),
+        DAYS.map((_, i) => {
+          const wd = i + 1, l = map[wd + '-' + b.lesson_no];
+          if (!l) return h('td', null, ro ? h('div', { class: 'slot ro' }) :
+            h('button', { class: 'slot', 'aria-label': `${DAYS[i]}, ${b.lesson_no}-dars: dars qo'shish`, onclick: () => editLesson({ weekday: wd, lesson_no: b.lesson_no }, lessons) }, '+'));
+          const line = mode === 'class'
+            ? [l.teacher_name ? shortName(l.teacher_name) : null, l.room ? l.room + '-xona' : null]
+            : [l.class_name + ' sinf', l.room ? l.room + '-xona' : null];
+          return h('td', null, h('button', {
+            class: 'lesson' + (ro ? ' ro' : ''), style: `--h:${hue(l.subject)}`, tabindex: ro ? '-1' : null,
+            onclick: ro ? null : () => editLesson(l, lessons),
+          }, h('strong', null, l.subject), h('span', null, line.filter(Boolean).join(' · '))));
+        })))));
+  }
+
+  function editLesson(l, lessons) {
+    const known = [...new Set([...lessons.map(x => x.subject), ...SUBJECTS])];
+    const bell = bells.find(b => b.lesson_no === l.lesson_no);
+    const subject = h('input', { name: 'subject', list: 'subjects', value: l.subject || '', required: true, maxlength: '80', autocomplete: 'off' });
+    const teacher = h('select', { name: 'teacher' }, h('option', { value: '' }, '— o\'qituvchisiz —'),
+      teachers.map(t => h('option', { value: t.id }, t.full_name)));
+    teacher.value = l.teacher_id || '';
+    const room = h('input', { name: 'room', value: l.room || '', maxlength: '20', placeholder: 'Masalan: 12' });
+    const dlg = h('dialog', null, h('form', { method: 'dialog' },
+      h('h2', null, `${DAYS[l.weekday - 1]}, ${l.lesson_no}-dars`),
+      h('p', { class: 'muted small' }, `${classes.find(c => c.id === targetId).name} sinf · ${bell.start_time}–${bell.end_time}`),
+      h('label', { class: 'f' }, 'Fan', subject, h('datalist', { id: 'subjects' }, known.map(s => h('option', { value: s })))),
+      h('label', { class: 'f' }, 'O\'qituvchi', teacher),
+      h('label', { class: 'f' }, 'Xona', room),
+      h('div', { class: 'foot' },
+        l.id ? h('button', { class: 'btn danger', type: 'button', onclick: () => guard(null, async () => {
+          await post('lessons', 'delete', { id: l.id }); dlg.close(); load();
+        }) }, 'O\'chirish') : h('span'),
+        h('div', null,
+          h('button', { class: 'btn ghost', type: 'button', onclick: () => dlg.close() }, 'Bekor qilish'),
+          h('button', { class: 'btn', type: 'submit', value: 'save' }, 'Saqlash')))));
+    dlg.querySelector('form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const payload = { class_id: targetId, weekday: l.weekday, lesson_no: l.lesson_no, subject: subject.value, teacher_id: teacher.value || null, room: room.value };
+      guard(null, async () => {
+        try { await post('lessons', 'save', payload); }
+        catch (ex) {
+          if (ex.status === 409 && ex.data && ex.data.conflict) {
+            if (!confirm(ex.message + '\n\nBaribir saqlansinmi?')) return;
+            await post('lessons', 'save', Object.assign({ force: true }, payload));
+          } else throw ex;
+        }
+        dlg.close(); toast('Saqlandi'); load();
+      });
+    });
+    dlg.addEventListener('close', () => dlg.remove());
+    document.body.append(dlg);
+    dlg.showModal();
+    subject.focus();
+  }
+
+  root.replaceChildren(
+    pageHead('Dars jadvali', 'Katakchani bosib darsni qo\'shing yoki o\'zgartiring. O\'qituvchi yoki xona bir vaqtda ikki sinfda band bo\'lsa, panel ogohlantiradi.',
+      h('div', { class: 'row noprint' }, modeSel, targetSel, h('button', { class: 'btn ghost', onclick: () => window.print() }, 'Chop etish'))),
+    host);
+  fillTargets();
+  await load();
+}
+
+/* ---------------------------------------------------------------- bells */
+
+async function viewBells(root) {
+  const { bells } = await api('bells');
+  let rows = bells.map(b => ({ lesson_no: b.lesson_no, start_time: b.start_time, end_time: b.end_time }));
+  const host = h('div', { class: 'card' });
+
+  const draw = () => {
+    const btn = h('button', { class: 'btn', onclick: (e) => guard(e.currentTarget, async () => {
+      await post('bells', 'save', { bells: rows }); toast('Saqlandi');
+    }) }, 'Saqlash');
+    host.replaceChildren(
+      h('table', { class: 'tbl' },
+        h('thead', null, h('tr', null, ['Dars', 'Boshlanishi', 'Tugashi', ''].map(x => h('th', null, x)))),
+        h('tbody', null, rows.map((r, i) => h('tr', null,
+          h('td', null, h('b', null, r.lesson_no + '-dars')),
+          h('td', null, h('input', { type: 'time', value: r.start_time, 'aria-label': `${r.lesson_no}-dars boshlanishi`, onchange: (e) => { r.start_time = e.target.value; } })),
+          h('td', null, h('input', { type: 'time', value: r.end_time, 'aria-label': `${r.lesson_no}-dars tugashi`, onchange: (e) => { r.end_time = e.target.value; } })),
+          h('td', null, h('button', { class: 'btn danger sm', onclick: () => { rows.splice(i, 1); draw(); } }, 'Olib tashlash')))))),
+      h('div', { class: 'row', style: 'margin-top:14px' },
+        h('button', { class: 'btn ghost', onclick: () => {
+          const last = rows[rows.length - 1];
+          const no = last ? last.lesson_no + 1 : 1;
+          let s = '08:00', e = '08:45';
+          if (last) { s = addMin(last.end_time, 10); e = addMin(s, 45); }
+          rows.push({ lesson_no: no, start_time: s, end_time: e }); draw();
+        } }, 'Dars qo\'shish'), btn));
+  };
+  draw();
+  root.replaceChildren(
+    pageHead('Qo\'ng\'iroqlar', 'Har bir dars qachon boshlanib, qachon tugashi. Bot “hozir” va “keyingi” darsni shu vaqtlar bo\'yicha aniqlaydi.'), host);
+}
+function addMin(t, m) {
+  const [hh, mm] = t.split(':').map(Number);
+  const x = Math.min(hh * 60 + mm + m, 23 * 60 + 59);
+  return String(Math.floor(x / 60)).padStart(2, '0') + ':' + String(x % 60).padStart(2, '0');
+}
+
+/* ---------------------------------------------------------------- settings */
+
+async function viewSettings(root) {
+  const me = await api('me');
+  const old = h('input', { type: 'password', name: 'old', autocomplete: 'current-password', required: true });
+  const nw = h('input', { type: 'password', name: 'new', autocomplete: 'new-password', minlength: '8', required: true });
+  const btn = h('button', { class: 'btn', type: 'submit' }, 'Parolni almashtirish');
+  const form = h('form', { class: 'stack', style: 'max-width:360px', onsubmit: (e) => {
+    e.preventDefault();
+    guard(btn, async () => {
+      await post('password', '', { old: old.value, new: nw.value });
+      old.value = ''; nw.value = ''; toast('Parol almashtirildi');
+    });
+  } }, h('label', { class: 'f' }, 'Joriy parol', old), h('label', { class: 'f' }, 'Yangi parol (kamida 8 belgi)', nw), btn);
+  root.replaceChildren(
+    pageHead('Sozlamalar', `Siz ${me.username} sifatida kirgansiz.`),
+    h('div', { class: 'card' }, h('h2', { style: 'margin-bottom:14px' }, 'Parol'), form),
+    h('div', { class: 'card' }, h('h2', null, 'Server'), h('p', { class: 'muted', style: 'margin-top:6px' }, 'Panel ulangan manzil: ', h('code', null, API || '(bir xil sayt)')),
+      h('p', { class: 'muted small', style: 'margin-top:6px' }, 'Manzilni o\'zgartirish uchun config.js faylini tahrirlang.')));
+}
+
+render();
+
+  </script>
+</body>
+</html>
