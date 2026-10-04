@@ -219,9 +219,8 @@ dialog .foot div { display: flex; gap: 8px; }
   <div id="app"></div>
   <div id="toasts" aria-live="polite"></div>
   <noscript>Admin panel ishlashi uchun JavaScript kerak.</noscript>
-  <script>// Backend (api.php joylashgan papka) manzili — oxirida "/" bo'lmasin.
-// Panel va backend boshqa-boshqa saytda bo'lsa, ikkalasi ham HTTPS bo'lishi shart.
-window.MAKTAB_API = 'https://6a70174330801.xvest4.ru/23maktab';</script>
+  <script>// PHP API is served through the same-origin Vercel proxy.
+window.MAKTAB_API = '/backend';</script>
   <script>
 'use strict';
 
@@ -272,7 +271,7 @@ async function api(resource, opts) {
       body: body ? JSON.stringify(body) : undefined,
     });
   } catch (e) {
-    throw new Error('Serverga ulanib bo\'lmadi. config.js dagi manzilni va internetni tekshiring.');
+    throw new Error('Serverga ulanib bo\'lmadi. Internet yoki backend serverni tekshiring.');
   }
   let data = {};
   try { data = await res.json(); } catch (e) {}
@@ -688,7 +687,7 @@ async function viewSettings(root) {
     pageHead('Sozlamalar', `Siz ${me.username} sifatida kirgansiz.`),
     h('div', { class: 'card' }, h('h2', { style: 'margin-bottom:14px' }, 'Parol'), form),
     h('div', { class: 'card' }, h('h2', null, 'Server'), h('p', { class: 'muted', style: 'margin-top:6px' }, 'Panel ulangan manzil: ', h('code', null, API || '(bir xil sayt)')),
-      h('p', { class: 'muted small', style: 'margin-top:6px' }, 'Manzilni o\'zgartirish uchun config.js faylini tahrirlang.')));
+      h('p', { class: 'muted small', style: 'margin-top:6px' }, 'Admin API Vercel orqali backend serverga ulanadi.')));
 }
 
 render();
