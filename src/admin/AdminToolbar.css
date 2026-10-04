@@ -1,0 +1,257 @@
+.admin-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--surface-solid);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 9998;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.toolbar-left h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.toolbar-group select {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-soft);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.toolbar-group select:hover,
+.toolbar-group select:focus {
+  border-color: var(--primary);
+  background: var(--surface-solid);
+}
+
+.unsaved-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 6px;
+  color: #ffc107;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-soft);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.toolbar-btn:hover:not(:disabled) {
+  background: var(--surface-solid);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.toolbar-btn.btn-cancel {
+  color: #dc3545;
+  border-color: rgba(220, 53, 69, 0.3);
+}
+
+.toolbar-btn.btn-cancel:hover:not(:disabled) {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+.toolbar-btn.btn-save {
+  color: #28a745;
+  border-color: rgba(40, 167, 69, 0.3);
+}
+
+.toolbar-btn.btn-save:hover:not(:disabled) {
+  background: rgba(40, 167, 69, 0.1);
+  border-color: #28a745;
+  color: #28a745;
+}
+
+.toolbar-btn.btn-exit {
+  color: #6c757d;
+  border-color: rgba(108, 117, 125, 0.3);
+}
+
+.toolbar-btn.btn-exit:hover:not(:disabled) {
+  background: rgba(108, 117, 125, 0.1);
+  border-color: #6c757d;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--line);
+}
+
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.admin-modal-dialog {
+  background: var(--surface-solid);
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.admin-modal-dialog h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: 'Cormorant Garamond', serif;
+  letter-spacing: -0.04em;
+}
+
+.admin-modal-dialog p {
+  margin: 0 0 24px 0;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-cancel-modal,
+.btn-exit-modal {
+  padding: 10px 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel-modal {
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.btn-cancel-modal:hover {
+  background: var(--surface-solid);
+  border-color: var(--primary);
+}
+
+.btn-exit-modal {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.btn-exit-modal:hover {
+  background: #c82333;
+  border-color: #c82333;
+}
+
+/* NOTE: admin toolbar is fixed and must not shift page layout. Do NOT add top padding to app shell. */
+/* Keep toolbar fixed overlay to avoid changing public site layout. */
+
+@media (max-width: 768px) {
+  .admin-toolbar {
+    height: auto;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .toolbar-left,
+  .toolbar-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .toolbar-btn span {
+    display: none;
+  }
+
+  .toolbar-left h3 {
+    font-size: 12px;
+  }
+}

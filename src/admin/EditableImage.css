@@ -1,0 +1,176 @@
+.editable-image-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.editable-image-display {
+  position: relative;
+  display: group;
+  group: 'editable-image' / contents;
+}
+
+.editable-image-display:hover .editable-image-trigger {
+  opacity: 1;
+}
+
+.editable-image-trigger {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  padding: 8px 12px;
+  background: rgba(63, 70, 255, 0.9);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.editable-image-trigger:hover {
+  background: rgba(63, 70, 255, 1);
+  transform: scale(1.05);
+}
+
+.editable-image-trigger span {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .editable-image-trigger span {
+    display: inline;
+  }
+}
+
+.editable-image-editor {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(63, 70, 255, 0.05);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.image-preview {
+  position: relative;
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--surface-soft);
+}
+
+.image-preview img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.image-upload-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.image-preview:hover .image-upload-overlay {
+  opacity: 1;
+}
+
+.upload-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid white;
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.upload-btn:hover {
+  background: white;
+  transform: scale(1.05);
+}
+
+.image-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.image-actions button {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-solid);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.image-actions .btn-save {
+  color: #28a745;
+  border-color: rgba(40, 167, 69, 0.3);
+}
+
+.image-actions .btn-save:hover {
+  background: rgba(40, 167, 69, 0.1);
+  border-color: rgba(40, 167, 69, 0.6);
+}
+
+.image-actions .btn-cancel {
+  color: #dc3545;
+  border-color: rgba(220, 53, 69, 0.3);
+}
+
+.image-actions .btn-cancel:hover {
+  background: rgba(220, 53, 69, 0.1);
+  border-color: rgba(220, 53, 69, 0.6);
+}
+
+.editable-image-wrapper.editing {
+  z-index: 100;
+}
+
+/* Admin-only hover outline for images */
+.app-shell.admin-mode .editable-image-wrapper:not(.editing):hover {
+  outline: 2px solid rgba(63,70,255,0.35);
+  outline-offset: 2px;
+}
