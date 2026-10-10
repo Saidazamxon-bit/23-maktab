@@ -1,32 +1,74 @@
-import { Search, SlidersHorizontal, Star } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { Search, SlidersHorizontal } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { PageHero } from '../components/PageHero'
 import { useLanguage } from '../i18n'
-import { teachers } from '../data/teachers'
+import { teachers as fallbackTeachers } from '../data/teachers'
+
+interface TeacherItem {
+  id: string
+  name: string
+  subject: string
+  role: string
+  experience: string
+  bio: string
+  image: string
+}
+
+function getInitials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? '')
+    .join('')
+}
 
 export function TeachersPage() {
   const { t } = useLanguage()
-  
-  const filterOptions = [
-    t.teachers.filterAll,
-    t.teachers.filters.math,
-    t.teachers.filters.cs,
-    t.teachers.filters.english,
-    t.teachers.filters.physics,
-  ]
-  
-  const [activeFilter, setActiveFilter] = useState(t.teachers.filterAll)
+
+  const [teachers, setTeachers] = useState<TeacherItem[]>(fallbackTeachers)
+  const [activeFilter, setActiveFilter] = useState('')
   const [query, setQuery] = useState('')
 
+  // Admin paneldan qo'shilgan o'qituvchilar (bazadan)
+  useEffect(() => {
+    let cancelled = false
+    fetch('/backend/public.php?r=teachers')
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((data) => {
+        if (cancelled || !Array.isArray(data?.teachers)) return
+        setTeachers(
+          data.teachers.map((x: any) => ({
+            id: String(x.id),
+            name: String(x.name ?? ''),
+            subject: String(x.subject ?? ''),
+            role: String(x.position ?? ''),
+            experience: String(x.experience ?? ''),
+            bio: String(x.bio ?? ''),
+            image: String(x.photo ?? ''),
+          })),
+        )
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const subjects = useMemo(
+    () => Array.from(new Set(teachers.map((x) => x.subject).filter(Boolean))),
+    [teachers],
+  )
+
   const filteredTeachers = useMemo(() => {
+    const needle = query.trim().toLowerCase()
     return teachers.filter((teacher) => {
-      const matchesFilter = activeFilter === t.teachers.filterAll || 
-                           (t.teachers.list.find(tItem => tItem.id === teacher.id)?.subject === activeFilter)
-      const needle = query.trim().toLowerCase()
-      const matchesSearch = !needle || `${teacher.name} ${teacher.subject} ${teacher.role}`.toLowerCase().includes(needle)
+      const matchesFilter = !activeFilter || teacher.subject === activeFilter
+      const matchesSearch =
+        !needle || `${teacher.name} ${teacher.subject} ${teacher.role}`.toLowerCase().includes(needle)
       return matchesFilter && matchesSearch
     })
-  }, [activeFilter, query, t.teachers])
+  }, [activeFilter, query, teachers])
 
   return (
     <>
@@ -41,7 +83,14 @@ export function TeachersPage() {
           <div className="container">
             <div className="toolbar glass-panel">
               <div className="filter-row">
-                {filterOptions.map((filter) => (
+                <button
+                  type="button"
+                  className={`filter-chip ${activeFilter === '' ? 'active' : ''}`}
+                  onClick={() => setActiveFilter('')}
+                >
+                  {t.teachers.filterAll}
+                </button>
+                {subjects.map((filter) => (
                   <button
                     key={filter}
                     type="button"
@@ -68,21 +117,22 @@ export function TeachersPage() {
               {filteredTeachers.map((teacher) => (
                 <article className="teacher-card glass-card" key={teacher.id}>
                   <div className="teacher-image-wrap">
-                    <img src={teacher.image} alt={teacher.name} />
-                    <span className="teacher-badge">{teacher.subject}</span>
+                    {teacher.image ? (
+                      <img src={teacher.image} alt={teacher.name} loading="lazy" />
+                    ) : (
+                      <div className="teacher-initials">{getInitials(teacher.name)}</div>
+                    )}
+                    {teacher.subject && <span className="teacher-badge">{teacher.subject}</span>}
                   </div>
                   <div className="teacher-body">
-                    <div className="teacher-header">
-                      <div>
-                        <h3>{teacher.name}</h3>
-                        <span>{teacher.role}</span>
+                    <h3 className="teacher-name">{teacher.name}</h3>
+                    {teacher.role && <span className="teacher-role">{teacher.role}</span>}
+                    {teacher.bio && <p>{teacher.bio}</p>}
+                    {teacher.experience && (
+                      <div className="teacher-meta">
+                        <span><SlidersHorizontal size={14} /> {teacher.experience}</span>
                       </div>
-                      <div className="teacher-rating"><Star size={14} /> 4.9</div>
-                    </div>
-                    <p>{teacher.bio}</p>
-                    <div className="teacher-meta">
-                      <span><SlidersHorizontal size={14} /> {teacher.experience}</span>
-                    </div>
+                    )}
                   </div>
                 </article>
               ))}
