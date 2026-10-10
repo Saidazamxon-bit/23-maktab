@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { PageHero } from '../components/PageHero'
 import { useLanguage } from '../i18n'
 import { teachers as fallbackTeachers } from '../data/teachers'
+import './teachers.css'
 
 interface TeacherItem {
   id: string
@@ -113,7 +114,7 @@ export function TeachersPage() {
               </label>
             </div>
 
-            <div className="teachers-grid">
+            <div className="teachers-grid teachers-page-grid">
               {filteredTeachers.map((teacher) => (
                 <article className="teacher-card glass-card" key={teacher.id}>
                   <div className="teacher-image-wrap">
